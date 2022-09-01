@@ -1,0 +1,30 @@
+{
+    "name": "jsramverk-editor-backend",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "nodemon src/app.js",
+        "production": "NODE_ENV='production' node src/app.js",
+        "format": "prettier --ignore-path .prettierignore --write \"**/*.+(js|ts|tsx|json)\" --config ./.prettierrc"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/VeronicaAxelsson/jsramverk-editor-backend.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/VeronicaAxelsson/jsramverk-editor-backend/issues"
+    },
+    "homepage": "https://github.com/VeronicaAxelsson/jsramverk-editor-backend#readme",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.0.2",
+        "express": "^4.18.1",
+        "mongodb": "^4.9.1",
+        "morgan": "^1.10.0",
+        "prettier": "^2.7.1"
+    }
+}
