@@ -76,8 +76,8 @@ REST API made in the course JSramverk.
 `PUT /docs/:documentId/`
 
 ### Response
-If success: 'Successfully updated one document.'
-If Doucment was not found: 'No document matched filter, new document created.'
+If success: {'message': 'Successfully updated one document.'}
+If Doucment was not found: {'message': 'No document matched filter, new document created.'}
 
 ## Delete a Document
 
@@ -86,5 +86,5 @@ If Doucment was not found: 'No document matched filter, new document created.'
 `DELETE /docs/:documentId`
 
 ### Response
-If success: 'Successfully deleted one document.'
-If document not found: 'No documents matched the query. Deleted 0 documents.'
+If success: { 'message': 'Successfully deleted one document.'}
+If document not found: {'message': 'No documents matched the query. Deleted 0 documents.'}
