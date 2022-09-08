@@ -1,18 +1,19 @@
 const express = require('express');
-const database = require('../db/db');
 const ObjectId = require('mongodb').ObjectId;
+let Document = require('../models/document');
+let mongoose = require('mongoose');
 
 var docsRouter = express.Router();
-let db;
 
-//Get all Method
-docsRouter.get('/', async (req, res, next) => {
+const dsn = `mongodb+srv://${process.env.ATLAS_USERNAME}:${process.env.ATLAS_PASSWORD}@jsramverk.gbjc7zt.mongodb.net/texteditor?retryWrites=true&w=majority`;
+
+docsRouter.get('/', async (req, res) => {
     try {
-        db = await database.getDb();
+        await mongoose.connect(dsn);
 
-        const data = await db.collection.find({}).toArray();
-        if (data) {
-            return res.status(200).json(data);
+        const document = await Document.find({});
+        if (document) {
+            return res.status(200).json(document);
         }
     } catch (e) {
         return res.status(500).json({
@@ -24,26 +25,70 @@ docsRouter.get('/', async (req, res, next) => {
             }
         });
     } finally {
-        await db.client.close();
+        await mongoose.connection.close();
     }
 });
 
-//Post Method
 docsRouter.post('/', express.json(), async (req, res) => {
     try {
-        db = await database.getDb();
+        await mongoose.connect(dsn);
         const data = req.body;
+        const document = await Document.create(data);
+
+        return res.status(201).json(document);
+    } catch (e) {
+        return res.status(500).json({
+            errors: {
+                status: 500,
+                source: '/',
+                title: 'Database error',
+                detail: e.message
+            }
+        });
+    } finally {
+        await mongoose.connection.close();        ;
+    }
+});
+
+docsRouter.get('/:documentId', async (req, res) => {
+    try {
+        await mongoose.connect(dsn);
+        const { documentId } = req.params;
+
+        const document = await Document.findById(documentId).exec();
+        if (document) {
+            return res.status(200).json(document);
+        }
+    } catch (e) {
+        return res.status(500).json({
+            errors: {
+                status: 500,
+                source: '/',
+                title: 'Database error',
+                detail: e.message
+            }
+        });
+    } finally {
+        await mongoose.connection.close();
+    }
+});
+
+docsRouter.put('/:documentId', express.json(), async (req, res) => {
+    try {
+        await mongoose.connect(dsn);
+        const { documentId } = req.params;
+        const document = await Document.findById(documentId).exec();
+
+        const data = req.body;
+
         const dataWithDate = {
             updatedAt: new Date(),
             ...data
         }
 
-        const result = await db.collection.insertOne(dataWithDate);
+        const result = await document.updateOne(dataWithDate);
+        res.status(200).json(document);
 
-        return res.status(201).json({
-            _id: result.insertId,
-            ...dataWithDate
-        });
     } catch (e) {
         return res.status(500).json({
             errors: {
@@ -54,86 +99,18 @@ docsRouter.post('/', express.json(), async (req, res) => {
             }
         });
     } finally {
-        await db.client.close();
+        await mongoose.connection.close();
     }
 });
 
-//Get by ID Method
-docsRouter.get('/:documentId', async (req, res) => {
-    try {
-        db = await database.getDb();
-        const { documentId } = req.params;
-        const o_id = new ObjectId(documentId);
-        const filter = { _id: o_id };
-
-        const data = await db.collection.findOne(filter);
-        if (data) {
-            return res.status(200).json(data);
-        }
-    } catch (e) {
-        return res.status(500).json({
-            errors: {
-                status: 500,
-                source: '/',
-                title: 'Database error',
-                detail: e.message
-            }
-        });
-    } finally {
-        await db.client.close();
-    }
-});
-
-//Update by ID Method
-docsRouter.put('/:documentId', express.json(), async (req, res) => {
-    try {
-        db = await database.getDb();
-        const { documentId } = req.params;
-        const oId = new ObjectId(documentId);
-        const filter = { _id: oId };
-
-        const newContent = req.body;
-        const newContentWithDate = {
-            updatedAt: new Date(),
-            ...newContent
-        }
-
-        //create new doucment if none is found
-        const options = { upsert: true };
-
-        const updateDoc = {
-            $set: newContentWithDate
-        };
-
-        const result = await db.collection.updateOne(filter, updateDoc, options);
-        if (result.upsertedCount === 1) {
-            res.status(200).json({ message: 'No document matched filter, new document created.'});
-        } else if (result.modifiedCount === 1) {
-            res.status(200).json({ message: 'Successfully updated one document.'});
-        }
-    } catch (e) {
-        return res.status(500).json({
-            errors: {
-                status: 500,
-                source: '/',
-                title: 'Database error',
-                detail: e.message
-            }
-        });
-    } finally {
-        await db.client.close();
-    }
-});
-
-//Delete by ID Method
 docsRouter.delete('/:documentId', async (req, res) => {
     try {
-        db = await database.getDb();
+        await mongoose.connect(dsn);
         const { documentId } = req.params;
         const oId = new ObjectId(documentId);
         const filter = { _id: oId };
 
-        const result = await db.collection.deleteOne(filter);
+        const result = await Document.deleteOne(filter);
         if (result.deletedCount === 1) {
             res.status(200).json({ message: 'Successfully deleted one document.' });
         } else {
@@ -149,7 +126,7 @@ docsRouter.delete('/:documentId', async (req, res) => {
             }
         });
     } finally {
-        await db.client.close();
+        await mongoose.connection.close();
     }
 });
 
