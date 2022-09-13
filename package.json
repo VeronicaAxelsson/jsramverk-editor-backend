@@ -4,11 +4,11 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test": "mocha",
+        "test": "SET NODE_ENV='test' && nyc --all --reporter=html --reporter=text mocha ./test/*.js --timeout 10000 --exit",
         "start": "nodemon src/app.js",
         "dev": "SET NODE_ENV='dev' && nodemon src/app.js",
-        "production": "NODE_ENV='production' node src/app.js",
-        "format": "prettier --ignore-path .prettierignore --write \"**/*.+(js|ts|tsx|json)\" --config ./.prettierrc"
+        "production": "SET NODE_ENV='production' && node src/app.js",
+        "format": "prettier --ignore-path .prettierignore --write \"**/*.+(js|ts|tsx|json)\" --config ./.prettierrc && eslint ."
     },
     "repository": {
         "type": "git",
@@ -33,6 +33,14 @@
     "devDependencies": {
         "chai": "^4.3.6",
         "chai-http": "^4.3.0",
-        "mocha": "^10.0.0"
+        "eslint": "^8.23.1",
+        "eslint-plugin-react": "^7.31.8",
+        "javascript-style-guide": "^1.0.1",
+        "mocha": "^10.0.0",
+        "nyc": "^15.1.0",
+        "rewire": "^6.0.0",
+        "sinon": "^14.0.0",
+        "sinon-chai": "^3.7.0",
+        "supertest": "^6.2.4"
     }
 }

@@ -3,18 +3,23 @@ const ObjectId = require('mongodb').ObjectId;
 let Document = require('../models/document');
 let mongoose = require('mongoose');
 
+require('dotenv').config();
+
 var docsRouter = express.Router();
 
-const dsn = `mongodb+srv://${process.env.ATLAS_USERNAME}:${process.env.ATLAS_PASSWORD}@jsramverk.gbjc7zt.mongodb.net/texteditor?retryWrites=true&w=majority`;
+let dsn = `mongodb+srv://${process.env.ATLAS_USERNAME}:${process.env.ATLAS_PASSWORD}@jsramverk.gbjc7zt.mongodb.net/texteditor?retryWrites=true&w=majority`;
+
+if (process.env.NODE_ENV === 'test') {
+    dsn = `mongodb+srv://${process.env.ATLAS_USERNAME}:${process.env.ATLAS_PASSWORD}@jsramverk.gbjc7zt.mongodb.net/test?retryWrites=true&w=majority`;
+}
 
 docsRouter.get('/', async (req, res) => {
     try {
         await mongoose.connect(dsn);
 
         const document = await Document.find({});
-        if (document) {
-            return res.status(200).json(document);
-        }
+
+        return res.status(200).json(document);
     } catch (e) {
         return res.status(500).json({
             errors: {
@@ -46,7 +51,7 @@ docsRouter.post('/', express.json(), async (req, res) => {
             }
         });
     } finally {
-        await mongoose.connection.close();        ;
+        await mongoose.connection.close();
     }
 });
 
@@ -56,9 +61,8 @@ docsRouter.get('/:documentId', async (req, res) => {
         const { documentId } = req.params;
 
         const document = await Document.findById(documentId).exec();
-        if (document) {
-            return res.status(200).json(document);
-        }
+
+        return res.status(200).json(document);
     } catch (e) {
         return res.status(500).json({
             errors: {
@@ -80,15 +84,14 @@ docsRouter.put('/:documentId', express.json(), async (req, res) => {
         const document = await Document.findById(documentId).exec();
 
         const data = req.body;
-
         const dataWithDate = {
             updatedAt: new Date(),
             ...data
-        }
+        };
 
-        const result = await document.updateOne(dataWithDate);
-        res.status(200).json(document);
+        await document.updateOne(dataWithDate);
 
+        res.status(204).json(document);
     } catch (e) {
         return res.status(500).json({
             errors: {
@@ -111,10 +114,13 @@ docsRouter.delete('/:documentId', async (req, res) => {
         const filter = { _id: oId };
 
         const result = await Document.deleteOne(filter);
+
         if (result.deletedCount === 1) {
-            res.status(200).json({ message: 'Successfully deleted one document.' });
+            res.status(204).json({ message: 'Successfully deleted one document.' });
         } else {
-            res.status(200).json({ message: 'No documents matched the query. Deleted 0 documents.' });
+            res.status(204).json({
+                message: 'No documents matched the query. Deleted 0 documents.'
+            });
         }
     } catch (e) {
         return res.status(500).json({
