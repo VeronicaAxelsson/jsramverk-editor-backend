@@ -10,7 +10,7 @@ var docsRouter = express.Router();
 let dsn = `mongodb+srv://${process.env.ATLAS_USERNAME}:${process.env.ATLAS_PASSWORD}@jsramverk.gbjc7zt.mongodb.net/texteditor?retryWrites=true&w=majority`;
 
 if (process.env.NODE_ENV === 'test') {
-    dsn = `mongodb+srv://${process.env.ATLAS_USERNAME}:${process.env.ATLAS_PASSWORD}@jsramverk.gbjc7zt.mongodb.net/test?retryWrites=true&w=majority`;
+    dsn = `mongodb://localhost:27017/test`;
 }
 
 docsRouter.get('/', async (req, res) => {

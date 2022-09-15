@@ -12,7 +12,7 @@ require('dotenv').config();
 let mongoose = require('mongoose');
 let Document = require('../src/models/document');
 let document;
-const dsn = `mongodb+srv://${process.env.ATLAS_USERNAME}:${process.env.ATLAS_PASSWORD}@jsramverk.gbjc7zt.mongodb.net/test?retryWrites=true&w=majority`;
+const dsn = `mongodb://localhost:27017/test`;
 const testData = {
     content: 'content',
     title: 'title'
