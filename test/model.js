@@ -1,6 +1,5 @@
 const chai = require('chai');
 const expect = chai.expect;
-const sinon = require('sinon');
 
 let Document = require('../src/models/document');
 
