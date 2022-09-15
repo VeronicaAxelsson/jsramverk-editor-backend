@@ -4,10 +4,9 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test": "SET NODE_ENV='test' && nyc --all --reporter=html --reporter=text mocha ./test/*.js --timeout 10000 --exit",
+        "test": " nyc --all --reporter=html --reporter=text mocha ./test/*.js --timeout 10000 --exit",
         "start": "nodemon src/app.js",
-        "dev": "SET NODE_ENV='dev' && nodemon src/app.js",
-        "production": "SET NODE_ENV='production' && node src/app.js",
+        "production": "node src/app.js",
         "format": "prettier --ignore-path .prettierignore --write \"**/*.+(js|ts|tsx|json)\" --config ./.prettierrc && eslint ."
     },
     "repository": {
