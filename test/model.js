@@ -1,7 +1,7 @@
 const chai = require('chai');
 const expect = chai.expect;
 
-let Document = require('../src/models/document');
+let Document = require('../models/document');
 
 describe('Testing Document model', () => {
     let testDocument;

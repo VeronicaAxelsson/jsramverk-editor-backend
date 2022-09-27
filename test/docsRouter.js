@@ -1,6 +1,6 @@
 process.env.NODE_ENV = 'test';
 
-let server = require('../src/app');
+let server = require('../app');
 let chai = require('chai');
 let chaiHttp = require('chai-http');
 
@@ -10,7 +10,7 @@ chai.use(chaiHttp);
 require('dotenv').config();
 
 let mongoose = require('mongoose');
-let Document = require('../src/models/document');
+let Document = require('../models/document');
 let document;
 const dsn = `mongodb://localhost:27017/test`;
 const testData = {
@@ -89,7 +89,7 @@ describe('Documents', () => {
                 .put(`/docs/${document._id}`)
                 .send(testData)
                 .end((err, res) => {
-                    res.should.have.status(204);
+                    res.should.have.status(200);
                     res.body.should.be.a('object');
                     done();
                 });
@@ -105,7 +105,7 @@ describe('Documents', () => {
                 .put(`/docs/${document._id}`)
                 .send(testData)
                 .end((err, res) => {
-                    res.should.have.status(204);
+                    res.should.have.status(200);
                     done();
                 });
         });

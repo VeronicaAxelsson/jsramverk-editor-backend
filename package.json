@@ -2,11 +2,12 @@
     "name": "jsramverk-editor-backend",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "main": "app.js",
     "scripts": {
         "test": " nyc --all --reporter=html --reporter=text mocha ./test/*.js --timeout 10000 --exit",
-        "start": "nodemon src/app.js",
-        "production": "node src/app.js",
+        "start": "node app.js",
+        "dev": "nodemon app.js",
+        "production": "node app.js",
         "format": "prettier --ignore-path .prettierignore --write \"**/*.+(js|ts|tsx|json)\" --config ./.prettierrc && eslint ."
     },
     "repository": {
@@ -27,7 +28,9 @@
         "mongoose": "^6.5.5",
         "morgan": "^1.10.0",
         "nodemon": "^2.0.19",
-        "prettier": "^2.7.1"
+        "prettier": "^2.7.1",
+        "socket.io": "^4.5.2",
+        "socket.io-client": "^4.5.2"
     },
     "devDependencies": {
         "chai": "^4.3.6",
@@ -41,5 +44,9 @@
         "sinon": "^14.0.0",
         "sinon-chai": "^3.7.0",
         "supertest": "^6.2.4"
+    },
+    "optionalDependencies": {
+        "bufferutil": "^4.0.6",
+        "utf-8-validate": "^5.0.9"
     }
 }
