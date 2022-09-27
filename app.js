@@ -2,11 +2,12 @@ const express = require('express');
 const routes = require('./routes/routes.js');
 const cors = require('cors');
 const morgan = require('morgan');
+
 require('dotenv').config();
 const docsController = require('./controllers/docsController');
 
 const app = express();
-const httpServer = require("http").createServer(app);
+const httpServer = require('http').createServer(app);
 
 const port = process.env.PORT || 1337;
 
@@ -26,6 +27,7 @@ if (process.env.NODE_ENV !== 'test') {
 
 app.use((req, res, next) => {
     var err = new Error('Not Found');
+
     err.status = 404;
     next(err);
 });
@@ -55,14 +57,13 @@ const io = require('socket.io')(httpServer, {
 
 let throttleTimer;
 
-
 io.sockets.on('connection', (socket) => {
     console.log(`id: ${socket.id}`); // Nått lång och slumpat
     console.log(socket.rooms);
 
-    socket.on("disconnect", () => {
+    socket.on('disconnect', () => {
         console.log('disconnected');
-      });
+    });
 
     socket.on('create', (room) => {
         console.log(`room: ${room}`);
@@ -70,23 +71,18 @@ io.sockets.on('connection', (socket) => {
         console.log(socket.rooms);
     });
 
-    socket.on('docsData', (data)=> {
+    socket.on('docsData', (data) => {
         console.log(`docsData sen to: ${data.documentId}`);
-        console.log(socket.rooms);
 
         socket.to(data.documentId).emit('docsData', data);
 
         clearTimeout(throttleTimer);
-        console.log('writing');
         throttleTimer = setTimeout(async () => {
-            const { content } = data; 
-            console.log(data);
-            let saved = await docsController.saveDocToDb(data.documentId, { content: content })
-            console.log(saved);
-            console.log('saved to database');
-        }, 2000)
-    })
+            const { content } = data;
 
+            await docsController.saveDocToDb(data.documentId, { content: content });
+        }, 2000);
+    });
 });
 // Start up server
 httpServer.listen(port, () => console.log(`Example API listening on port ${port}!`));

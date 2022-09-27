@@ -1,7 +1,7 @@
-const express = require('express');
 const ObjectId = require('mongodb').ObjectId;
 let Document = require('../models/document');
 let mongoose = require('mongoose');
+
 require('dotenv').config();
 
 let dsn = `mongodb+srv://${process.env.ATLAS_USERNAME}:${process.env.ATLAS_PASSWORD}@jsramverk.gbjc7zt.mongodb.net/texteditor?retryWrites=true&w=majority`;
@@ -29,8 +29,7 @@ exports.getAllDocs = async (req, res) => {
     } finally {
         await mongoose.connection.close();
     }
-}
-
+};
 
 exports.getOneDoc = async (req, res) => {
     try {
@@ -52,7 +51,7 @@ exports.getOneDoc = async (req, res) => {
     } finally {
         await mongoose.connection.close();
     }
-}
+};
 
 exports.createDoc = async (req, res) => {
     try {
@@ -73,8 +72,7 @@ exports.createDoc = async (req, res) => {
     } finally {
         await mongoose.connection.close();
     }
-}
-
+};
 
 exports.saveDocToDb = async (documentId, data) => {
     await mongoose.connect(dsn);
@@ -88,10 +86,11 @@ exports.saveDocToDb = async (documentId, data) => {
     await document.updateOne(dataWithDate);
 
     const newDocument = await Document.findById(documentId).exec();
+
     await mongoose.connection.close();
 
     return newDocument;
-}
+};
 
 exports.updateDoc = async (req, res) => {
     try {
@@ -111,7 +110,7 @@ exports.updateDoc = async (req, res) => {
             }
         });
     }
-}
+};
 
 exports.deleteDoc = async (req, res) => {
     try {
@@ -141,4 +140,4 @@ exports.deleteDoc = async (req, res) => {
     } finally {
         await mongoose.connection.close();
     }
-}
+};
