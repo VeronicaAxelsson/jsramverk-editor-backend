@@ -13,4 +13,8 @@ docsRouter.put('/:documentId', express.json(), docsController.updateDoc);
 
 docsRouter.delete('/:documentId', docsController.deleteDoc);
 
+docsRouter.post('/addEditor', express.json(), docsController.addEditor);
+
+docsRouter.post('/removeEditor', express.json(), docsController.removeEditor);
+
 module.exports = docsRouter;

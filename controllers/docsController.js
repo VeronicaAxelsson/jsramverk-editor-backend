@@ -14,8 +14,21 @@ exports.getAllDocs = async (req, res) => {
     try {
         await mongoose.connect(dsn);
 
-        const document = await Document.find({});
+        const owner = req.query.owner;
+        const allowed_editor = req.query.allowed_editor;
+        let document = [];
 
+        if (owner) {
+            document = await Document.find({ owner: owner });
+        }
+
+        if (allowed_editor) {
+            document = await Document.find({ allowed_editors: allowed_editor });
+        }
+
+        if (!owner && !allowed_editor) {
+            document = await Document.find({});
+        }
         return res.status(200).json(document);
     } catch (e) {
         return res.status(500).json({
@@ -128,6 +141,73 @@ exports.deleteDoc = async (req, res) => {
                 message: 'No documents matched the query. Deleted 0 documents.'
             });
         }
+    } catch (e) {
+        return res.status(500).json({
+            errors: {
+                status: 500,
+                source: '/',
+                title: 'Database error',
+                detail: e.message
+            }
+        });
+    } finally {
+        await mongoose.connection.close();
+    }
+};
+
+exports.addEditor = async (req, res) => {
+    try {
+        await mongoose.connect(dsn);
+        const { documentId, editorEmail } = req.body;
+        const filter = { _id: documentId };
+
+        // Check if user allready is editor
+        const document = await Document.findById(documentId).exec();
+        if (document && document.allowed_editors.includes(editorEmail)) {
+            return res.status(500).json({
+                errors: {
+                    status: 500,
+                    message: 'User allready an editor.'
+                }
+            });
+        }
+
+        const updateDocument = {
+            $push: { allowed_editors: editorEmail }
+        };
+
+        const result = await Document.updateOne(filter, updateDocument);
+
+        return res.status(200).json(result);
+    } catch (e) {
+        return res.status(500).json({
+            errors: {
+                status: 500,
+                source: '/',
+                title: 'Database error',
+                detail: e.message
+            }
+        });
+    } finally {
+        await mongoose.connection.close();
+    }
+};
+
+exports.removeEditor = async (req, res) => {
+    try {
+        await mongoose.connect(dsn);
+        const { documentId, editorEmail } = req.body;
+        const filter = { _id: documentId };
+
+        console.log('försöker ta bort');
+
+        const updateDocument = {
+            $pull: { allowed_editors: editorEmail }
+        };
+
+        const result = await Document.updateOne(filter, updateDocument);
+
+        return res.status(200).json(result);
     } catch (e) {
         return res.status(500).json({
             errors: {

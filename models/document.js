@@ -3,9 +3,11 @@ let Schema = mongoose.Schema;
 
 //Doc schema definition
 let DocumentSchema = new Schema({
+    owner: { type: mongoose.ObjectId },
     content: { type: String },
     title: { type: String },
-    updatedAt: { type: Date, default: () => Date.now() }
+    updatedAt: { type: Date, default: () => Date.now() },
+    allowed_editors: { type: [String] }
 });
 
 DocumentSchema.pre('save', (next) => {
