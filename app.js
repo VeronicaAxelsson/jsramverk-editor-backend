@@ -80,7 +80,7 @@ io.sockets.on('connection', (socket) => {
         throttleTimer = setTimeout(async () => {
             const { content } = data;
 
-            await docsController.saveDocToDb(data.documentId, { content: content });
+            await docsController.updateDoc(data.documentId, { content: content });
         }, 2000);
     });
 });

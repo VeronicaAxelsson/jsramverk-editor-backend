@@ -13,44 +13,25 @@ if (process.env.NODE_ENV === 'test') {
     dsn = `mongodb://localhost:27017/test`;
 }
 
-exports.getAllUsers = async (req, res) => {
+exports.getAllUsers = async () => {
     try {
         await mongoose.connect(dsn);
 
         const users = await User.find({});
 
-        return res.status(200).json(users);
-    } catch (e) {
-        return res.status(500).json({
-            errors: {
-                status: 500,
-                source: '/',
-                title: 'Database error',
-                detail: e.message
-            }
-        });
+        return users;
     } finally {
         await mongoose.connection.close();
     }
 };
 
-exports.getOneUser = async (req, res) => {
+exports.getOneUser = async (userId) => {
     try {
         await mongoose.connect(dsn);
-        const { userId } = req.params;
 
         const user = await User.findById(userId).exec();
 
-        return res.status(200).json(user);
-    } catch (e) {
-        return res.status(500).json({
-            errors: {
-                status: 500,
-                source: '/',
-                title: 'Database error',
-                detail: e.message
-            }
-        });
+        return user;
     } finally {
         await mongoose.connection.close();
     }
@@ -165,52 +146,26 @@ exports.loginUser = async (req, res) => {
     }
 };
 
-exports.updateUser = async (req, res) => {
+exports.updateUser = async (userId, data) => {
     try {
-        const { userId } = req.params;
-        const data = req.body;
+        await mongoose.connect(dsn);
 
         const user = await User.findById(userId).exec();
         const response = await user.updateOne(data);
 
-        return res.status(200).json(response);
-    } catch (e) {
-        return res.status(500).json({
-            errors: {
-                status: 500,
-                source: '/',
-                title: 'Database error',
-                detail: e.message
-            }
-        });
+        return response;
+    } finally  {
+        await mongoose.connection.close();
     }
 };
 
-exports.deleteUser = async (req, res) => {
+exports.deleteUser = async (userId) => {
     try {
         await mongoose.connect(dsn);
-        const { userId } = req.params;
-        const oId = new ObjectId(userId);
-        const filter = { _id: oId };
+        const filter = { _id: userId };
 
         const result = await User.deleteOne(filter);
-
-        if (result.deletedCount === 1) {
-            return res.status(200).json({ message: 'Successfully deleted one user.' });
-        } else {
-            return res.status(200).json({
-                message: 'No users matched the query. Deleted 0 users.'
-            });
-        }
-    } catch (e) {
-        return res.status(500).json({
-            errors: {
-                status: 500,
-                source: '/',
-                title: 'Database error',
-                detail: e.message
-            }
-        });
+        return result;
     } finally {
         await mongoose.connection.close();
     }

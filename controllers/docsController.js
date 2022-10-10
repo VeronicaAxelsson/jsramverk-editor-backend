@@ -10,146 +10,80 @@ if (process.env.NODE_ENV === 'test') {
     dsn = `mongodb://localhost:27017/test`;
 }
 
-exports.getAllDocs = async (req, res) => {
+exports.getAllDocs = async (owner, allowed_editor) => {
     try {
-        await mongoose.connect(dsn);
-
-        const owner = req.query.owner;
-        const allowed_editor = req.query.allowed_editor;
-        let document = [];
+        await mongoose.connect(dsn)
+        let documents = [];
 
         if (owner) {
-            document = await Document.find({ owner: owner });
+            documents = await Document.find({ owner: owner });
         }
-
+    
         if (allowed_editor) {
-            document = await Document.find({ allowed_editors: allowed_editor });
+            documents = await Document.find({ allowed_editors: allowed_editor });
+        }
+    
+        if (!owner && !allowed_editor) {
+            documents = await Document.find({});
         }
 
-        if (!owner && !allowed_editor) {
-            document = await Document.find({});
-        }
-        return res.status(200).json(document);
-    } catch (e) {
-        return res.status(500).json({
-            errors: {
-                status: 500,
-                source: '/',
-                title: 'Database error',
-                detail: e.message
-            }
-        });
+        return documents;
     } finally {
         await mongoose.connection.close();
     }
 };
 
-exports.getOneDoc = async (req, res) => {
+exports.getOneDoc = async (documentId) => {
     try {
         await mongoose.connect(dsn);
-        const { documentId } = req.params;
+        console.log(documentId);
 
         const document = await Document.findById(documentId).exec();
 
-        return res.status(200).json(document);
-    } catch (e) {
-        return res.status(500).json({
-            errors: {
-                status: 500,
-                source: '/',
-                title: 'Database error',
-                detail: e.message
-            }
-        });
+        return document;
     } finally {
         await mongoose.connection.close();
     }
 };
 
-exports.createDoc = async (req, res) => {
+exports.createDoc = async (data) => {
     try {
         await mongoose.connect(dsn);
-        const data = req.body;
         const document = await Document.create(data);
 
-        return res.status(201).json(document);
-    } catch (e) {
-        return res.status(500).json({
-            errors: {
-                status: 500,
-                source: '/',
-                title: 'Database error',
-                detail: e.message
-            }
-        });
+        return document;
     } finally {
         await mongoose.connection.close();
     }
 };
 
-exports.saveDocToDb = async (documentId, data) => {
-    await mongoose.connect(dsn);
-    const document = await Document.findById(documentId).exec();
+exports.updateDoc = async (documentId, data) => {
 
-    const dataWithDate = {
-        updatedAt: new Date(),
-        ...data
-    };
-
-    await document.updateOne(dataWithDate);
-
-    const newDocument = await Document.findById(documentId).exec();
-
-    await mongoose.connection.close();
-
-    return newDocument;
-};
-
-exports.updateDoc = async (req, res) => {
     try {
-        const { documentId } = req.params;
-        const data = req.body;
-
-        const response = await this.saveDocToDb(documentId, data);
-
-        return res.status(200).json(response);
-    } catch (e) {
-        return res.status(500).json({
-            errors: {
-                status: 500,
-                source: '/',
-                title: 'Database error',
-                detail: e.message
-            }
-        });
+        await mongoose.connect(dsn);
+        const document = await Document.findById(documentId).exec();
+    
+        const dataWithDate = {
+            updatedAt: new Date(),
+            ...data
+        };
+    
+        await document.updateOne(dataWithDate);
+    
+        const newDocument = await Document.findById(documentId).exec();
+        return newDocument;
+    } finally {
+        await mongoose.connection.close();
     }
 };
 
-exports.deleteDoc = async (req, res) => {
+exports.deleteDoc = async (documentId) => {
     try {
         await mongoose.connect(dsn);
-        const { documentId } = req.params;
-        const oId = new ObjectId(documentId);
-        const filter = { _id: oId };
+        const filter = { _id: documentId };
 
         const result = await Document.deleteOne(filter);
-
-        if (result.deletedCount === 1) {
-            return res.status(200).json({ message: 'Successfully deleted one document.' });
-        } else {
-            return res.status(200).json({
-                message: 'No documents matched the query. Deleted 0 documents.'
-            });
-        }
-    } catch (e) {
-        return res.status(500).json({
-            errors: {
-                status: 500,
-                source: '/',
-                title: 'Database error',
-                detail: e.message
-            }
-        });
+        return result;
     } finally {
         await mongoose.connection.close();
     }
