@@ -109,6 +109,9 @@ docsRouter.delete('/:documentId', async (req, res) => {
     }
 });
 
+//For email link
+// docsRouter.get('/addEditor', docsController.addEditorWithEmailLink);
+
 docsRouter.post('/addEditor', express.json(), docsController.addEditor);
 
 docsRouter.post('/removeEditor', express.json(), docsController.removeEditor);

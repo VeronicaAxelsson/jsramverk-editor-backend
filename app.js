@@ -72,7 +72,7 @@ io.sockets.on('connection', (socket) => {
     });
 
     socket.on('docsData', (data) => {
-        console.log(`docsData sen to: ${data.documentId}`);
+        console.log(`docsData sent to: ${data.documentId}`);
 
         socket.to(data.documentId).emit('docsData', data);
 

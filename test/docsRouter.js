@@ -1,9 +1,16 @@
 process.env.NODE_ENV = 'test';
-
-let server = require('../app');
 let chai = require('chai');
 let chaiHttp = require('chai-http');
+const sinon = require('sinon');
+const authController = require('../controllers/authController');
 
+sinon.stub(authController, 'checkToken')
+    .callsFake((req, res, next) => {
+        return next();
+    });
+
+
+let server = require('../app');
 chai.should();
 chai.use(chaiHttp);
 

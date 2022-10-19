@@ -8,7 +8,9 @@ let DocumentSchema = new Schema({
     content: { type: String },
     title: { type: String },
     updatedAt: { type: Date, default: () => Date.now() },
-    allowed_editors: { type: [String] }
+    allowed_editors: { type: [String] },
+    type: { type: String },
+    comments: {type: [Object]}
 });
 
 DocumentSchema.pre('save', (next) => {

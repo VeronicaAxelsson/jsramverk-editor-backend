@@ -37,6 +37,18 @@ exports.getOneUser = async (userId) => {
     }
 };
 
+exports.getOneUserByEmail = async (email) => {
+    try {
+        await mongoose.connect(dsn);
+
+        const user = await User.findOne({ email: email }).exec();
+        
+        return user;
+    } finally {
+        await mongoose.connection.close();
+    }
+};
+
 exports.createUser = async (req, res) => {
     try {
         await mongoose.connect(dsn);
