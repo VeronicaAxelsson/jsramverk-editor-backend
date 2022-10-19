@@ -16,6 +16,7 @@ const DocumentType = new GraphQLObjectType({
         ownerEmail: { type: GraphQLString },
         content: { type: GraphQLString },
         title: { type: GraphQLString },
+        type: { type: GraphQLString },
         updatedAt: { type: GraphQLString },
         allowed_editors: { type: new GraphQLList(GraphQLString) }
     })

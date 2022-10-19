@@ -1,5 +1,6 @@
 const ObjectId = require('mongodb').ObjectId;
 let Document = require('../models/document');
+let User = require('../models/user');
 let mongoose = require('mongoose');
 
 require('dotenv').config();
@@ -36,7 +37,6 @@ exports.getAllDocs = async (owner, allowed_editor) => {
 exports.getOneDoc = async (documentId) => {
     try {
         await mongoose.connect(dsn);
-        console.log(documentId);
 
         const document = await Document.findById(documentId).exec();
 
@@ -89,11 +89,57 @@ exports.deleteDoc = async (documentId) => {
     }
 };
 
+// exports.addEditorWithEmailLink = async (req, res) => {
+//     try {
+//         await mongoose.connect(dsn);
+//         const { documentId, editorEmail } = req.params;
+//         const filter = { _id: documentId };
+
+//         //Check if user exists
+//         const user = await User.findOne({ email: editorEmail }).exec();
+
+//         if (!user) {
+//             return res.status(500).json({message: 'User does not exist'});
+//         }
+
+//         // Check if user allready is editor
+//         const document = await Document.findById(documentId).exec();
+//         if (document && document.allowed_editors.includes(editorEmail)) {
+//             return res.status(500).json({
+//                 errors: {
+//                     status: 500,
+//                     message: 'User allready an editor.'
+//                 }
+//             });
+//         }
+
+//         const updateDocument = {
+//             $push: { allowed_editors: editorEmail }
+//         };
+
+//         await Document.updateOne(filter, updateDocument);
+
+//         return res.redirect('https://www.student.bth.se/~veax20/editor/');
+//     } catch (e) {
+//         return res.status(500).json({
+//             errors: {
+//                 status: 500,
+//                 source: '/',
+//                 title: 'Database error',
+//                 detail: e.message
+//             }
+//         });
+//     } finally {
+//         await mongoose.connection.close();
+//     }
+// };
+
 exports.addEditor = async (req, res) => {
     try {
         await mongoose.connect(dsn);
         const { documentId, editorEmail } = req.body;
         const filter = { _id: documentId };
+
 
         // Check if user allready is editor
         const document = await Document.findById(documentId).exec();
