@@ -35,7 +35,6 @@ describe('Email', () => {
             chai.request(server)
                 .post(`/email`)
                 .end((err, res) => {
-                    console.log(res);
                     expect(res.body)
                         .to.be.an('object')
                         .that.has.property('message');
