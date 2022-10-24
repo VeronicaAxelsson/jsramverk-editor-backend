@@ -1,6 +1,14 @@
 let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
+let CommentSchema = new Schema({
+    comment: { type: String },
+    commenter: { type: String },
+    rangeIndex: { type: Number },
+    rangeLength: { type: Number },
+    date: { type: Date, default: () => Date.now() }
+});
+
 //Doc schema definition
 let DocumentSchema = new Schema({
     owner: { type: mongoose.ObjectId },
@@ -10,7 +18,7 @@ let DocumentSchema = new Schema({
     updatedAt: { type: Date, default: () => Date.now() },
     allowed_editors: { type: [String] },
     type: { type: String },
-    comments: {type: [Object]}
+    comments: { type: [CommentSchema] }
 });
 
 DocumentSchema.pre('save', (next) => {

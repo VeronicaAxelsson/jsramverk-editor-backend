@@ -25,11 +25,9 @@ docsRouter.get('/', async (req, res) => {
     }
 });
 
-
 docsRouter.post('/', express.json(), async (req, res) => {
     try {
         const data = req.body;
-
         const document = await docsController.createDoc(data);
 
         return res.status(201).json(document);
@@ -48,8 +46,9 @@ docsRouter.post('/', express.json(), async (req, res) => {
 docsRouter.get('/:documentId', async (req, res) => {
     try {
         const { documentId } = req.params;
-
         const document = await docsController.getOneDoc(documentId);
+
+        console.log(`api: ${document}`);
 
         return res.status(200).json(document);
     } catch (e) {
@@ -87,7 +86,6 @@ docsRouter.put('/:documentId', express.json(), async (req, res) => {
 docsRouter.delete('/:documentId', async (req, res) => {
     try {
         const { documentId } = req.params;
-
         const result = await docsController.deleteDoc(documentId);
 
         if (result.deletedCount === 1) {
@@ -109,11 +107,40 @@ docsRouter.delete('/:documentId', async (req, res) => {
     }
 });
 
-//For email link
-// docsRouter.get('/addEditor', docsController.addEditorWithEmailLink);
+docsRouter.post('/addEditor', express.json(), async (req, res) => {
+    try {
+        const { documentId, editorEmail } = req.body;
+        const result = await docsController.addEditor(documentId, editorEmail);
 
-docsRouter.post('/addEditor', express.json(), docsController.addEditor);
+        return res.status(200).json(result);
+    } catch (e) {
+        return res.status(500).json({
+            errors: {
+                status: 500,
+                source: '/',
+                title: 'Database error',
+                detail: e.message
+            }
+        });
+    }
+});
 
-docsRouter.post('/removeEditor', express.json(), docsController.removeEditor);
+docsRouter.post('/removeEditor', express.json(), async (req, res) => {
+    try {
+        const { documentId, editorEmail } = req.body;
+        const result = await docsController.removeEditor(documentId, editorEmail);
+
+        return res.status(200).json(result);
+    } catch (e) {
+        return res.status(500).json({
+            errors: {
+                status: 500,
+                source: '/',
+                title: 'Database error',
+                detail: e.message
+            }
+        });
+    }
+});
 
 module.exports = docsRouter;

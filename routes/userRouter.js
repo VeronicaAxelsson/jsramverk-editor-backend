@@ -17,7 +17,7 @@ userRouter.get('/', async (req, res) => {
                 detail: e.message
             }
         });
-    } 
+    }
 });
 
 userRouter.get('/:userId', async (req, res) => {
