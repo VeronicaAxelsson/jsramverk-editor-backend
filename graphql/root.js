@@ -1,16 +1,10 @@
-const {
-    GraphQLObjectType,
-    GraphQLString,
-    GraphQLList,
-    GraphQLFloat,
-    GraphQLNonNull
-} = require('graphql');
+const { GraphQLObjectType, GraphQLString, GraphQLList } = require('graphql');
 
 const docsController = require('../controllers/docsController');
 const userController = require('../controllers/userController');
 
-const DocumentType = require("./document");
-const UserType = require('./user')
+const DocumentType = require('./document');
+const UserType = require('./user');
 
 const RootQueryType = new GraphQLObjectType({
     name: 'Query',
@@ -24,7 +18,11 @@ const RootQueryType = new GraphQLObjectType({
                 allowedEditor: { type: GraphQLString }
             },
             resolve: async (parent, args) => {
-                const allDocuments = await docsController.getAllDocs(args.owner, args.allowedEditor);
+                const allDocuments = await docsController.getAllDocs(
+                    args.owner,
+                    args.allowedEditor
+                );
+
                 return allDocuments;
             }
         },
@@ -36,6 +34,7 @@ const RootQueryType = new GraphQLObjectType({
             },
             resolve: async (parent, args) => {
                 const document = await docsController.getOneDoc(args.documentId);
+
                 return document;
             }
         },
@@ -44,6 +43,7 @@ const RootQueryType = new GraphQLObjectType({
             description: 'List all users',
             resolve: async () => {
                 const allUsers = await userController.getAllUsers();
+
                 return allUsers;
             }
         },
@@ -55,9 +55,10 @@ const RootQueryType = new GraphQLObjectType({
             },
             resolve: async (parent, args) => {
                 const user = await userController.getOneUser(args.userId);
+
                 return user;
             }
-        },
+        }
     })
 });
 

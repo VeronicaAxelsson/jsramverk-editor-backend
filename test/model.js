@@ -10,7 +10,19 @@ describe('Testing Document model', () => {
     beforeEach(() => {
         testDocument = {
             content: 'content',
-            title: 'title'
+            title: 'title',
+            allowed_editors: ['test@test.se'],
+            ownerEmail: 'test@test.se',
+            owner: '634e75f97bfb7f5afec8fa56',
+            type: 'text',
+            comments: [
+                {
+                    comment: 'comment',
+                    commenter: 'test@test.se',
+                    rangeIndex: 2,
+                    rangeLength: 3
+                }
+            ]
         };
     });
 
@@ -25,9 +37,31 @@ describe('Testing Document model', () => {
             } else {
                 expect(doc.content).to.equal('content');
                 expect(doc.title).to.equal('title');
-                //TODO: test dateTime
+                expect(doc.allowed_editors).to.be.a('array');
+                expect(doc.ownerEmail).to.equal('test@test.se');
+                expect(doc.owner).to.be.a('object');
+                expect(doc.type).to.equal('text');
+                expect(doc.comments).to.be.a('array');
                 done();
             }
+        });
+    });
+
+    it('it should fail due to wrong field', (done) => {
+        let doc = new Document({ test: 'test' });
+
+        doc.validate((err) => {
+            expect(err);
+            done();
+        });
+    });
+
+    it('it should fail due to wrong type', (done) => {
+        let doc = new Document({ content: 1 });
+
+        doc.validate((err) => {
+            expect(err);
+            done();
         });
     });
 });
@@ -56,6 +90,24 @@ describe('Testing User model', () => {
                 //TODO: test dateTime
                 done();
             }
+        });
+    });
+
+    it('it should fail due to wrong field', (done) => {
+        let doc = new Document({ test: 'test' });
+
+        doc.validate((err) => {
+            expect(err);
+            done();
+        });
+    });
+
+    it('it should fail due to wrong type', (done) => {
+        let doc = new Document({ email: 1 });
+
+        doc.validate((err) => {
+            expect(err);
+            done();
         });
     });
 });
