@@ -3,7 +3,7 @@ const mailgun = require('mailgun-js');
 require('dotenv').config();
 
 const express = require('express');
-// const mg = mailgun({ apiKey: process.env.MAILGUN_API_KEY, domain: process.env.MAILGUN_DOMAIN });
+const mg = mailgun({ apiKey: process.env.MAILGUN_API_KEY, domain: process.env.MAILGUN_DOMAIN });
 
 var emailRouter = express.Router();
 
@@ -11,7 +11,7 @@ emailRouter.post('/', express.json(), async (req, res) => {
     const { email, inviterEmail, documentTitle } = req.body;
 
     try {
-        mailgun({ apiKey: process.env.MAILGUN_API_KEY, domain: process.env.MAILGUN_DOMAIN }).messages().send(
+        mg.messages().send(
             {
                 from: 'ABC Editor <abc@editor.com>',
                 to: email,
