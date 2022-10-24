@@ -20,8 +20,7 @@ chai.use(chaiHttp);
 
 describe('Email', () => {
     beforeEach(() => {
-        const sandbox = sinon.createSandbox();
-        sandbox.stub(mg.Mailgun.prototype, 'messages')
+        sinon.stub(mg.Mailgun.prototype, 'messages')
             .returns({
                 send: (data, cb) => cb(),
             });       
@@ -32,11 +31,12 @@ describe('Email', () => {
     })
 
     describe('/POST email', () => {
-        it('it should return success message if mg.message.send succeed.', (done) => {
+        it('it should return an object when called upon', (done) => {
 
             chai.request(server)
                 .post(`/email`)
                 .end((err, res) => {
+                    console.log(res);
                     expect(res.body)
                         .to.be.an('object')
                         .that.has.property('message');
@@ -46,63 +46,30 @@ describe('Email', () => {
     });
 });
 
-// describe('Email', () => {
-//     beforeEach(() => {
-//         const sandbox = sinon.createSandbox();
+describe('Email', () => {
+    beforeEach(() => {
+        sinon.stub(mg.Mailgun.prototype, 'messages')
+            .throws(Error('mailgun failed'))
+    });
 
-//         let mailgunSendSpy = sandbox.stub().yields('error', { message: 'error' });
+    afterEach(() => {
+        sinon.restore();
+    })
 
-//         sandbox.stub(mg.Mailgun.prototype, 'messages')
-//         .returns({
-//             send: mailgunSendSpy
-//         })
-//     });
-
-//     afterEach(() => {
-//         sinon.restore();
-//     })
-
-//     describe('/POST email', () => {
-
-//         it('it should catch the error when mg.message.send fails to send email', (done) => {
-//             chai.request(server)
-//                 .post(`/email`)
-//                 .end((err, res) => {
-//                     res.should.have.status(500);
-//                     expect(res.body)
-//                         .to.be.an('object')
-//                         .that.has.property('message')
-//                         .equal('Error in sending email.');
-//                     done();
-//                 });
-//         });
-//     });
-// });
-
-// describe('Email', () => {
-//     beforeEach(() => {
-//         sinon.stub(mg.Mailgun.prototype, 'messages')
-//             .throws(Error('mailgun failed'))
-//     });
-
-//     afterEach(() => {
-//         sinon.restore();
-//     })
-
-//     describe('/POST email', () => {
-//         it('it should catch the error when something else then sending the email goes wrong.', (done) => {
-//             chai.request(server)
-//                 .post(`/email`)
-//                 .end((err, res) => {
-//                     res.should.have.status(500);
-//                     expect(res.body)
-//                         .to.be.an('object')
-//                         .that.has.property('message')
-//                         .equal('error');
-//                     done();
-//                 });
-//         });
-//     });
-// });
+    describe('/POST email', () => {
+        it('it should catch the error when something else then sending the email goes wrong.', (done) => {
+            chai.request(server)
+                .post(`/email`)
+                .end((err, res) => {
+                    res.should.have.status(500);
+                    expect(res.body)
+                        .to.be.an('object')
+                        .that.has.property('message')
+                        .equal('error');
+                    done();
+                });
+        });
+    });
+});
 
 sinon.restore();
