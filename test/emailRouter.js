@@ -45,7 +45,6 @@ describe('Email', () => {
                         expect(res.body.errors)
                             .to.be.an('object')
                             .that.has.property('message')
-                            .equal('Error in sending email.');
                         done();
                     });
             });
