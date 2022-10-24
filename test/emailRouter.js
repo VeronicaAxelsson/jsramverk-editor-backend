@@ -11,51 +11,27 @@ sinon.stub(authController, 'checkToken').callsFake((req, res, next) => {
     return next();
 });
 
-sinon.stub(mailgun({ apiKey: 'foo', domain: 'bar' }).Mailgun.prototype, 'messages')
-  .returns({
-    send: (data, cb) => cb(),
-  });
-
 let server = require('../app');
 
 chai.should();
 chai.use(chaiHttp);
 
-let Document = require('../models/document');
-let document;
-const testData = {
-    email: 'veronica-a@live.se',
-    inviterEmail: 'inviter@inviter.se',
-    documentTitle: 'title'
-};
-
-const failTestData = {
-    email: 'test@test.se',
-    inviterEmail: 'inviter@inviter.se',
-    documentTitle: 'title'
-};
-
-chai.use(chaiHttp);
-//Our parent block
 describe('Email', () => {
     beforeEach(() => {
-        return new Promise(async (resolve) => {
-            try {
-                await Document.deleteMany({});
-                document = await Document.create(testData);
-            } catch (e) {
-                console.error(e);
-            } finally {
-                resolve();
-            }
-        });
+        sinon.stub(mailgun({ apiKey: 'foo', domain: 'bar' }).Mailgun.prototype, 'messages')
+            .returns({
+            send: (data, cb) => cb(),
+            });        
     });
 
+    afterEach(() => {
+        sinon.restore();
+    })
+
     describe('/POST email', () => {
-        it('it should send email to registerd email', (done) => {
+        it('it should return success message if mg.message.send succeed.', (done) => {
             chai.request(server)
                 .post(`/email`)
-                .send(testData)
                 .end((err, res) => {
                     res.should.have.status(200);
                     expect(res.body)
@@ -65,17 +41,60 @@ describe('Email', () => {
                     done();
                 });
         });
+    });
+});
 
-        it('it should not send email to unregisterd email', (done) => {
+describe('Email', () => {
+    beforeEach(() => {
+        let mailgunSendSpy = sinon.stub().yields('error', { message: 'error' });
+
+        sinon.stub(mailgun({ apiKey: 'foo', domain: 'bar' }).Mailgun.prototype, 'messages')
+        .returns({
+            send: mailgunSendSpy
+        })
+    });
+
+    afterEach(() => {
+        sinon.restore();
+    })
+
+    describe('/POST email', () => {
+
+        it('it should catch the error when mg.message.send fails to send email', (done) => {
             chai.request(server)
                 .post(`/email`)
-                .send(failTestData)
                 .end((err, res) => {
                     res.should.have.status(500);
                     expect(res.body)
                         .to.be.an('object')
                         .that.has.property('message')
                         .equal('Error in sending email.');
+                    done();
+                });
+        });
+    });
+});
+
+describe('Email', () => {
+    beforeEach(() => {
+        sinon.stub(mailgun({ apiKey: 'foo', domain: 'bar' }).Mailgun.prototype, 'messages')
+            .throws(Error('mailgun failed'))
+    });
+
+    afterEach(() => {
+        sinon.restore();
+    })
+
+    describe('/POST email', () => {
+        it('it should catch the error when something else then sending the email goes wrong.', (done) => {
+            chai.request(server)
+                .post(`/email`)
+                .end((err, res) => {
+                    res.should.have.status(500);
+                    expect(res.body)
+                        .to.be.an('object')
+                        .that.has.property('message')
+                        .equal('error');
                     done();
                 });
         });
