@@ -14,6 +14,11 @@ sinon.stub(authController, 'checkToken').callsFake((req, res, next) => {
 let mg = mailgun({ apiKey: 'foo', domain: 'bar' });
 
 let server = require('../app');
+const testData = {
+    email: 'email@email.se', 
+    inviterEmail: 'inviter@inviter.se', 
+    documentTitle: 'title' 
+}
 
 chai.should();
 chai.use(chaiHttp);
@@ -34,7 +39,9 @@ describe('Email', () => {
         it('it should return an object when called upon', (done) => {
             chai.request(server)
                 .post(`/email`)
+                .send(testData)
                 .end((err, res) => {
+                    console.log(res);
                     expect(res.body)
                         .to.be.an('object')
                         .that.has.property('message');
