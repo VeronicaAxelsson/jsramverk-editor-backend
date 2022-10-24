@@ -32,7 +32,6 @@ describe('Email', () => {
 
     describe('/POST email', () => {
         it('it should return an object when called upon', (done) => {
-
             chai.request(server)
                 .post(`/email`)
                 .end((err, res) => {
