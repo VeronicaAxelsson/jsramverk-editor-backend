@@ -16,8 +16,6 @@ let server = require('../app');
 chai.should();
 chai.use(chaiHttp);
 
-let sendEmailStub = sinon.stub(emailController, 'sendEmail');
-
 describe('Email', () => {
     afterEach(() => {
         sinon.restore();
@@ -37,28 +35,20 @@ describe('Email', () => {
                     done();
                 });
         });
-    });
-});
 
-describe('Email', () => {
-    afterEach(() => {
-        sinon.restore();
-    })
-
-    describe('/POST email', () => {
-        it('it should catch the error if sendEmail returns promise reject', (done) => {
-            sendEmailStub.rejects(new Error('Error in sending email.'));
-            chai.request(server)
-                .post(`/email`)
-                .end((err, res) => {
-                    res.should.have.status(500);
-                    console.log(res);
-                    expect(res.body.errors)
-                        .to.be.an('object')
-                        .that.has.property('message')
-                        .equal('Error in sending email.');
-                    done();
-                });
+        describe('/POST email', () => {
+            it('it should catch the error if sendEmail returns promise reject', (done) => {
+                chai.request(server)
+                    .post(`/email`)
+                    .end((err, res) => {
+                        res.should.have.status(500);
+                        expect(res.body.errors)
+                            .to.be.an('object')
+                            .that.has.property('message')
+                            .equal('Error in sending email.');
+                        done();
+                    });
+            });
         });
     });
 });
