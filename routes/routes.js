@@ -19,7 +19,7 @@ const schema = new GraphQLSchema({
 
 routes.use('/docs', authController.checkToken, docsRouter);
 routes.use('/user', authController.checkToken, userRouter);
-routes.use('/email', authController.checkToken, emailRouter);
+routes.use('/email', emailRouter);
 routes.use(
     '/graphql',
     authController.checkToken,

@@ -14,14 +14,15 @@ sinon.stub(authController, 'checkToken').callsFake((req, res, next) => {
 let mg = mailgun({ apiKey: 'foo', domain: 'bar' });
 
 let server = require('../app');
+
+chai.should();
+chai.use(chaiHttp);
+
 const testData = {
     email: 'email@email.se', 
     inviterEmail: 'inviter@inviter.se', 
     documentTitle: 'title' 
 }
-
-chai.should();
-chai.use(chaiHttp);
 
 describe('Email', () => {
     beforeEach(() => {
@@ -31,9 +32,9 @@ describe('Email', () => {
             });       
     });
 
-    afterEach(() => {
-        sinon.restore();
-    })
+    // afterEach(() => {
+    //     sinon.restore();
+    // })
 
     describe('/POST email', () => {
         it('it should return an object when called upon', (done) => {
@@ -51,30 +52,30 @@ describe('Email', () => {
     });
 });
 
-describe('Email', () => {
-    beforeEach(() => {
-        sinon.stub(mg.Mailgun.prototype, 'messages')
-            .throws(Error('mailgun failed'))
-    });
+// describe('Email', () => {
+//     beforeEach(() => {
+//         sinon.stub(mg.Mailgun.prototype, 'messages')
+//             .throws(Error('mailgun failed'))
+//     });
 
-    afterEach(() => {
-        sinon.restore();
-    })
+//     // afterEach(() => {
+//     //     sinon.restore();
+//     // })
 
-    describe('/POST email', () => {
-        it('it should catch the error when something else then sending the email goes wrong.', (done) => {
-            chai.request(server)
-                .post(`/email`)
-                .end((err, res) => {
-                    res.should.have.status(500);
-                    expect(res.body)
-                        .to.be.an('object')
-                        .that.has.property('message')
-                        .equal('error');
-                    done();
-                });
-        });
-    });
-});
+//     describe('/POST email', () => {
+//         it('it should catch the error when something else then sending the email goes wrong.', (done) => {
+//             chai.request(server)
+//                 .post(`/email`)
+//                 .end((err, res) => {
+//                     res.should.have.status(500);
+//                     expect(res.body)
+//                         .to.be.an('object')
+//                         .that.has.property('message')
+//                         .equal('error');
+//                     done();
+//                 });
+//         });
+//     });
+// });
 
 sinon.restore();
