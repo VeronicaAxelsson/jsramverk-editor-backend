@@ -1,4 +1,4 @@
-const mailgun = require('mailgun-js');
+const emailController = require('../controllers/emailController');
 
 require('dotenv').config();
 
@@ -8,25 +8,34 @@ var emailRouter = express.Router();
 
 emailRouter.post('/', express.json(), async (req, res) => {
     const { email, inviterEmail, documentTitle } = req.body;
-
     try {
-        mailgun({ apiKey: process.env.MAILGUN_API_KEY, domain: process.env.MAILGUN_DOMAIN }).messages().send(
-            {
-                from: 'ABC Editor <abc@editor.com>',
-                to: email,
-                subject: 'ABC Editor',
-                html: `<div><p>User ${inviterEmail} has invited you to edit a document, ${documentTitle}, in ABC Editor</p><a href="https://www.student.bth.se/~veax20/editor/">Don't have an account? Click here to register</a></div>`
-            },
-            (error) => {
-                if (error) {
-                    return res.status(500).json({ message: 'Error in sending email.' });
-                }
-                return res.status(200).json({ message: 'Email sent succesfully!' });
+        await emailController.sendEmail(email, inviterEmail, documentTitle);
+        res.json({message: 'Email sent succesfully!'});
+        await next();
+       } catch (e) {
+        return res.status(500).json({
+            errors: {
+                status: 500,
+                source: '/',
+                message: e.message
             }
-        );
-    } catch (error) {
-        return res.status(500).json({ message: 'error' });
-    }
+        });
+     }
+    // try {
+    //     const { email, inviterEmail, documentTitle } = req.body;
+    //     const result = await emailController.sendEmail(email, inviterEmail, documentTitle);
+    //     console.log(result);
+    //     return res.status(200).json(result);
+    // } catch (error) {
+    //     return res.status(500).json({
+    //         errors: {
+    //             status: 500,
+    //             source: '/',
+    //             title: 'Database error',
+    //             detail: e.message
+    //         }
+    //     });
+    // }
 });
 
 module.exports = emailRouter;

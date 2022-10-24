@@ -18,12 +18,6 @@ let server = require('../app');
 chai.should();
 chai.use(chaiHttp);
 
-const testData = {
-    email: 'email@email.se', 
-    inviterEmail: 'inviter@inviter.se', 
-    documentTitle: 'title' 
-}
-
 describe('Email', () => {
     beforeEach(() => {
         sinon.stub(mg.Mailgun.prototype, 'messages')
@@ -37,15 +31,48 @@ describe('Email', () => {
     })
 
     describe('/POST email', () => {
-        it('it should return an object when called upon', (done) => {
+        it('it should return success message if mg.message.send succeed.', (done) => {
+
             chai.request(server)
                 .post(`/email`)
-                .send(testData)
                 .end((err, res) => {
-                    console.log(res);
+                    res.should.have.status(200);
                     expect(res.body)
                         .to.be.an('object')
-                        .that.has.property('message');
+                        .that.has.property('message')
+                        .equal('Email sent succesfully!');
+                    done();
+                });
+        });
+    });
+});
+
+describe('Email', () => {
+    beforeEach(() => {
+
+        let mailgunSendSpy = sinon.stub().yields('error', { message: 'error' });
+
+        sinon.stub(mg.Mailgun.prototype, 'messages')
+        .returns({
+            send: mailgunSendSpy
+        })
+    });
+
+    afterEach(() => {
+        sinon.restore();
+    })
+
+    describe('/POST email', () => {
+
+        it('it should catch the error when mg.message.send fails to send email', (done) => {
+            chai.request(server)
+                .post(`/email`)
+                .end((err, res) => {
+                    res.should.have.status(500);
+                    expect(res.body.errors)
+                        .to.be.an('object')
+                        .that.has.property('message')
+                        .equal('Error in sending email.');
                     done();
                 });
         });
@@ -55,7 +82,7 @@ describe('Email', () => {
 describe('Email', () => {
     beforeEach(() => {
         sinon.stub(mg.Mailgun.prototype, 'messages')
-            .throws(Error('mailgun failed'))
+            .throws(Error('Something went wrong.'))
     });
 
     afterEach(() => {
@@ -68,10 +95,10 @@ describe('Email', () => {
                 .post(`/email`)
                 .end((err, res) => {
                     res.should.have.status(500);
-                    expect(res.body)
+                    expect(res.body.errors)
                         .to.be.an('object')
                         .that.has.property('message')
-                        .equal('error');
+                        .equal('Something went wrong.');
                     done();
                 });
         });
